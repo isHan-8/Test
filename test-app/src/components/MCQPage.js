@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const mcqData = [
   {
     id: 1,
-    question: "Hina invested ₹9600 in each of bank P and Q for 4 years. Bank P offers simple interest at 4% rate of interest whereas bank Q offers simple interest at 7% rate of interest",
+    question: "Hina invested ₹9600 in each of bank P and Q for 4 years. Bank P offers simple interest at 4% rate of interest whereas bank Q offers simple interest at 7% rate of interest?",
     options: ["21,450", "21,550", "21,600", "21,500"],
     correctAnswer: "21,450"
   },
@@ -63,7 +63,6 @@ const mcqData = [
   }
 ];
 
-
 const MCQPage = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState(Array(mcqData.length).fill(null));
@@ -80,10 +79,9 @@ const MCQPage = () => {
 
   // Convert seconds to HH:MM:SS format
   const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
     const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+    return `${s}`;
   };
 
   const handleOptionChange = (index, option) => {
@@ -100,8 +98,17 @@ const MCQPage = () => {
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
+      const newAnswers = [...answers];
+      newAnswers[currentQuestion] = null; // Clear the answer for the current question
+      setAnswers(newAnswers);
       setCurrentQuestion(currentQuestion - 1);
     }
+  };
+
+  const handleClearOption = () => {
+    const newAnswers = [...answers];
+    newAnswers[currentQuestion] = null; // Clear the answer for the current question
+    setAnswers(newAnswers);
   };
 
   const handleSubmit = () => {
@@ -110,38 +117,51 @@ const MCQPage = () => {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-100">
-      {/* Profile Section */}
-      <div className="w-full bg-white p-1 m-6 flex items-center justify-between shadow-md">
-        <div className="flex items-center">
-          <img
-            src="https://via.placeholder.com/40"
-            alt="User Icon"
-            className="rounded-full mr-3"
-          />
-          <div>
-            <p className="text-9 ">Prateek Kumar</p>
-            <p className="text-7 font-semibold text-gray-600">Time left : {formatTime(timeLeft)}</p>
+    <div className="w-full h-screen flex items-center justify-center">
+      {/* Main MCQ Section with Specific Dimensions */}
+      <div
+        className="bg-white p-9 shadow-md flex flex-col"
+        style={{
+          width: '1630px',
+          height: '780px',
+          position: 'absolute',
+          top: '20px',
+          left: '30px',
+        }}
+      >
+        {/* User Profile and Timer Section */}
+        <div className="flex justify-between items-center mb-6 p-4 rounded-md">
+          <div className="flex items-center">
+            <img
+              src="https://cdn-icons-png.flaticon.com/128/456/456212.png"
+              alt="User Icon"
+              className="rounded-full mr-3"
+              style={{ width: '70px', height: '65px' }} // Adjust size as needed
+            />
+            <div className="flex flex-col">
+              <p className="text-lg font-bold">Prateek Kumar</p>
+              <p className="text-lg font-semibold text-gray-700">Time left: {formatTime(timeLeft)}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main MCQ Section */}
-      <div className="w-full max-w-8xl bg-white p-9 shadow-md flex flex-col h-full">
+        {/* Question Section */}
         <div className="mb-5">
-          <h2 className="text-xl font-semibold">Question {currentQuestion + 1}</h2>
-          <hr className="border-light-gray mb-2" />
-          <p className="mt-6 text-xl"> 1. {mcqData[currentQuestion].question}</p>
-          <div className="mt-6 space-y-4 p-5"> {/* Added space between options */}
+          <h2 className="text-2xl font-semibold">Question {currentQuestion + 1}</h2>
+          <hr className="border-light-gray mb-4" />
+          <p className="text-lg mb-6">1. {mcqData[currentQuestion].question}</p>
+
+          {/* Options Section with Larger Spacing and Text */}
+          <div className="space-y-6">
             {mcqData[currentQuestion].options.map((option, idx) => (
-              <label key={idx} className="block">
+              <label key={idx} className="block text-lg">
                 <input
                   type="radio"
                   name={`question-${currentQuestion}`}
                   value={option}
                   checked={answers[currentQuestion] === option}
                   onChange={() => handleOptionChange(currentQuestion, option)}
-                  className="mr-2"
+                  className="mr-6"
                 />
                 {option}
               </label>
@@ -149,26 +169,26 @@ const MCQPage = () => {
           </div>
         </div>
 
-        <div className="flex justify-between mt-80">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-10 mb-3">
           <button
-            onClick={handlePrevious}
-            disabled={currentQuestion === 0}
-            className="bg-gray-500 text-white px-4 py-2 rounded disabled:bg-gray-300"
+            onClick={handleClearOption}
+            className="bg-blue-500 text-white px-8 py-1 rounded"
           >
-            Clear Section
+            Clear Answer
           </button>
 
           {currentQuestion === mcqData.length - 1 ? (
             <button
               onClick={handleSubmit}
-              className="bg-green-500 text-white px-4 py-3 rounded"
+              className="bg-green-500 text-white px-8 py-1 rounded"
             >
               Submit
             </button>
           ) : (
             <button
               onClick={handleNext}
-              className="bg-blue-500 text-white px-3 py-2 rounded"
+              className="bg-blue-500 text-white px-8 py-2 rounded"
             >
               Next
             </button>
