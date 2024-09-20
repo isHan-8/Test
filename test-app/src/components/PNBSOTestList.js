@@ -25,12 +25,17 @@ const PNBSOTestList = () => {
         {tests.map((test) => (
           <div 
             key={test.id} 
-            className="p-4 bg-white shadow-lg rounded-md transition duration-200"
-            style={{ borderTop: `6px solid #42B2F5`, border: '1px solid lightgray' }} // Dark blue border
+            className="p-4 bg-white shadow-lg rounded-md transition duration-200 relative" // relative to position the top border
+            style={{ border: '1px solid lightgray' }} // Gray border
           >
+            {/* Blue Top Border */}
+            <div 
+              className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-md" 
+            ></div>
+
             <div className="flex justify-between mb-4">
               <p className="font-semibold">{test.name}</p>
-              <p className="font-semibold">🏆Max score: {test.maxScore}</p>
+              <p className="font-semibold">🏆 Max score: {test.maxScore}</p>
             </div>
             <hr className="border-light-gray mb-2" />
             <div className="flex justify-between mb-4">
