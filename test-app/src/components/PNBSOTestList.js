@@ -32,7 +32,7 @@ const PNBSOTestList = () => {
             <div 
               className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-md" 
             ></div>
-
+    
             <div className="flex justify-between mb-4">
               <p className="font-semibold">{test.name}</p>
               <p className="font-semibold">🏆 Max score: {test.maxScore}</p>

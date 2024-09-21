@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import ResultPage from './ResultPage';  // Import the Result Page
 const mcqData = [
   {
     id: 1,
@@ -67,21 +67,21 @@ const MCQPage = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState(Array(mcqData.length).fill(null));
   const [timeLeft, setTimeLeft] = useState(3600); // 1 hour in seconds
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [results, setResults] = useState(null); // To store result summary after submission
 
-  // Timer logic
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
     }, 1000);
 
-    return () => clearInterval(timer); // Cleanup the interval on unmount
+    return () => clearInterval(timer); // Clean up timer
   }, []);
 
-  // Convert seconds to HH:MM:SS format
   const formatTime = (seconds) => {
     const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
-    return `${s}`;
+    return `${m}:${s}`;
   };
 
   const handleOptionChange = (index, option) => {
@@ -98,35 +98,50 @@ const MCQPage = () => {
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
-      const newAnswers = [...answers];
-      newAnswers[currentQuestion] = null; // Clear the answer for the current question
-      setAnswers(newAnswers);
       setCurrentQuestion(currentQuestion - 1);
     }
   };
 
   const handleClearOption = () => {
     const newAnswers = [...answers];
-    newAnswers[currentQuestion] = null; // Clear the answer for the current question
+    newAnswers[currentQuestion] = null;
     setAnswers(newAnswers);
   };
 
+  // Function to handle submission
   const handleSubmit = () => {
-    console.log("User's Answers:", answers);
-    alert("Test submitted!");
+    const correctAnswersCount = answers.filter((answer, index) => answer === mcqData[index].correctAnswer).length;
+    const wrongAnswersCount = answers.filter((answer, index) => answer && answer !== mcqData[index].correctAnswer).length;
+    const unattemptedCount = answers.filter((answer) => answer === null).length;
+    
+    const resultSummary = {
+      correctAnswers: correctAnswersCount,
+      wrongAnswers: wrongAnswersCount,
+      unattempted: unattemptedCount,
+      totalQuestions: mcqData.length,
+      totalScore: correctAnswersCount * 10, // Assuming each question is worth 10 points
+      answers: answers, // Also pass user's answers
+    };
+
+    setResults(resultSummary);
+    setIsSubmitted(true); // Navigate to the result page after submitting
   };
+
+  // If the test is submitted, render the ResultPage and pass mcqData as a prop
+  if (isSubmitted) {
+    return <ResultPage results={results} mcqData={mcqData} />;
+  }
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      {/* Main MCQ Section with Specific Dimensions */}
       <div
         className="bg-white p-9 shadow-md flex flex-col"
         style={{
-          width: '1630px',
-          height: '780px',
-          position: 'absolute',
-          top: '20px',
-          left: '30px',
+          width: '90%',
+          maxWidth: '1085px',
+          height: '85%',
+          maxHeight: '800px',
+          position: 'relative',
         }}
       >
         {/* User Profile and Timer Section */}
@@ -136,7 +151,7 @@ const MCQPage = () => {
               src="https://cdn-icons-png.flaticon.com/128/456/456212.png"
               alt="User Icon"
               className="rounded-full mr-3"
-              style={{ width: '70px', height: '65px' }} // Adjust size as needed
+              style={{ width: '70px', height: '65px' }} 
             />
             <div className="flex flex-col">
               <p className="text-lg font-bold">Prateek Kumar</p>
@@ -146,12 +161,11 @@ const MCQPage = () => {
         </div>
 
         {/* Question Section */}
-        <div className="mb-5">
+        <div className="mb-5 overflow-auto">
           <h2 className="text-2xl font-semibold">Question {currentQuestion + 1}</h2>
           <hr className="border-light-gray mb-4" />
-          <p className="text-lg mb-6">1. {mcqData[currentQuestion].question}</p>
+          <p className="text-lg mb-6">{mcqData[currentQuestion].question}</p>
 
-          {/* Options Section with Larger Spacing and Text */}
           <div className="space-y-6">
             {mcqData[currentQuestion].options.map((option, idx) => (
               <label key={idx} className="block text-lg">
@@ -173,26 +187,36 @@ const MCQPage = () => {
         <div className="flex justify-between mt-10 mb-3">
           <button
             onClick={handleClearOption}
-            className="bg-blue-500 text-white px-8 py-1 rounded"
+            className="bg-blue-500 text-white px-6 py-1 rounded"
           >
             Clear Answer
           </button>
 
-          {currentQuestion === mcqData.length - 1 ? (
-            <button
-              onClick={handleSubmit}
-              className="bg-green-500 text-white px-8 py-1 rounded"
-            >
-              Submit
-            </button>
-          ) : (
-            <button
-              onClick={handleNext}
-              className="bg-blue-500 text-white px-8 py-2 rounded"
-            >
-              Next
-            </button>
-          )}
+          <div className="space-x-4">
+            {currentQuestion > 0 && (
+              <button
+                onClick={handlePrevious}
+                className="bg-gray-500 text-white px-8 py-2 rounded"
+              >
+                Previous
+              </button>
+            )}
+            {currentQuestion === mcqData.length - 1 ? (
+              <button
+                onClick={handleSubmit}
+                className="bg-green-500 text-white px-8 py-2 rounded"
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
+                className="bg-blue-500 text-white px-9 py-2 rounded"
+              >
+                Next
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
